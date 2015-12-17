@@ -1,4 +1,9 @@
-WINNING_SCENARIOS = { 'rock' => 'scissors', 'paper' => 'rock', 'scissors' => 'paper' }
+WINNING_SCENARIOS = { 'rock' => %w(scissors lizard),
+                      'paper' => %w(rock spock),
+                      'scissors' => %w(lizard paper),
+                      'lizard' => %w(paper spock),
+                      'spock' => %w(rock scissors)
+ }
 
 def prompt(message)
   puts "=> #{message}"
@@ -9,7 +14,8 @@ def display_results(player, computer)
     prompt("It's a tie!")
   else
     WINNING_SCENARIOS.each do |winner, loser|
-      next if ([winner, loser] & [player, computer]).size < 2
+      players = [player, computer]
+      next if !players.include?(winner) || (players & loser).empty?
       prompt("#{(winner == player ? 'You' : 'Computer')} won!")
     end
   end
@@ -17,9 +23,15 @@ end
 
 loop do
   choice = ''
+
   loop do
     prompt("Choose one: #{WINNING_SCENARIOS.keys.join(', ')}")
     choice = gets.chomp
+    if choice == 's'
+      prompt("Did you mean scissors or spock? use sp/sc")
+      next
+    end
+    choice = WINNING_SCENARIOS.keys.detect { |winner| winner.start_with?(choice)}
 
     if WINNING_SCENARIOS.include?(choice)
       break
@@ -27,6 +39,7 @@ loop do
       prompt("That's not a valid choice.")
     end
   end
+
   computer_choice = WINNING_SCENARIOS.keys.sample
 
   puts "You chose: #{choice}; Computer chose: #{computer_choice}"
